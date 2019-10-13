@@ -6,7 +6,7 @@ import sflorezs1.eafit.Lists.Stack;
 
 public class Message {
     private LinkedList<Character> list;
-    private Stack<String> operations;
+    private final Stack<String> operations;
     private Clipboard clipboard;
 
     /**
@@ -41,15 +41,19 @@ public class Message {
         return operations;
     }
 
-    public void setOperations(Stack<String> operations) {
-        this.operations = operations;
-    }
+// --Commented out by Inspection START (10/13/2019 5:03 PM):
+//    public void setOperations(Stack<String> operations) {
+//        this.operations = operations;
+//    }
+// --Commented out by Inspection STOP (10/13/2019 5:03 PM)
 
     public Clipboard getClipboard() {
         return clipboard;
     }
 
-    public void setClipboard(Clipboard clipboard) {
-        this.clipboard = clipboard;
-    }
+// --Commented out by Inspection START (10/13/2019 5:03 PM):
+//    public void setClipboard(Clipboard clipboard) {
+//        this.clipboard = clipboard;
+//    }
+// --Commented out by Inspection STOP (10/13/2019 5:03 PM)
 }

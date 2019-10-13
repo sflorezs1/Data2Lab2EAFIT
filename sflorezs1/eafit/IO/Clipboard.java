@@ -5,7 +5,7 @@ import sflorezs1.eafit.Lists.LinkedList;
 import java.util.HashMap;
 
 public class Clipboard {
-    private HashMap<Integer, LinkedList<Character>> holder;
+    private final HashMap<Integer, LinkedList<Character>> holder;
 
     public Clipboard() {
         this.holder = new HashMap<>();
@@ -30,9 +30,7 @@ public class Clipboard {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        this.holder.entrySet().forEach(entry->{
-            sb.append(entry.getKey()).append(" <-> ").append(entry.getValue()).append('\n');
-        });
+        this.holder.forEach((key, value) -> sb.append(key).append(" <-> ").append(value).append('\n'));
         return sb.toString();
     }
 }

@@ -3,10 +3,13 @@ package sflorezs1.eafit.UnMixer;
 import sflorezs1.eafit.IO.InputOutput;
 import sflorezs1.eafit.Lists.LinkedList;
 import sflorezs1.eafit.Lists.Stack;
+import sflorezs1.eafit.Menu.Menu;
 import sflorezs1.eafit.Message;
 import sflorezs1.eafit.Mixer.Mixer;
 
 import java.util.InputMismatchException;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class UnMixer extends Mixer {
 
@@ -31,8 +34,9 @@ public class UnMixer extends Mixer {
             switch (parts[0]) {
                 case "b":
                     try {
-                        int startB = Integer.parseInt(parts[2]);
-                        int endB = parts[1].length() + startB - 1;
+                        String sb = IntStream.range(1, parts.length - 1).mapToObj(i -> parts[i] + (i >= parts.length - 1 ? "" : " ")).collect(Collectors.joining());
+                        int startB = Integer.parseInt(parts[parts.length - 1]);
+                        int endB = sb.length() + startB - 1;
                         LinkedList<Character> unInsertAt = deleteRange(startB, endB);
                         if (unInsertAt == null) {
                             cantBeUndone(operation);
@@ -49,7 +53,14 @@ public class UnMixer extends Mixer {
                     try {
                         int position = Integer.parseInt(operation.split(";%;")[0].split(" ")[1]);
                         LinkedList<Character> insertion = InputOutput.readMessage(operation.split(";%;")[1]);
-                        boolean unDeleteRange = insertAt(position, insertion);
+                        boolean unDeleteRange;
+                        if (getMessage().getList().size() <= position) {
+                            getMessage().getList().append(' ');
+                            unDeleteRange = insertAt(position, insertion);
+                            getMessage().getList().remove(getMessage().getList().size() - 1);
+                        } else {
+                            unDeleteRange = insertAt(position, insertion);
+                        }
                         if (!unDeleteRange) {
                             cantBeUndone(operation);
                         } else {
@@ -76,6 +87,7 @@ public class UnMixer extends Mixer {
                             }
                             undone(operation);
                         }
+                        undone(operation);
                         break;
                     } catch (InputMismatchException e) {
                         System.err.println("The given key [" + operation + "] does not match the structure [d *;%;#l]," +
@@ -86,7 +98,6 @@ public class UnMixer extends Mixer {
                     try {
                         if (operation.split(";%;").length > 1) {
                             char original = parts[1].charAt(0);
-                            char replacement = parts[2].split(";%;")[0].charAt(0);
                             LinkedList<Integer> positions = InputOutput.parseIntList(operation.split(";%;")[1]);
                             for (int i = 0; i < positions.size(); i++) {
                                 getMessage().getList().replace(positions.get(i), original);
@@ -150,7 +161,7 @@ public class UnMixer extends Mixer {
                 case "cc":
                     try {
                         int rotations = Integer.parseInt(parts[1]);
-                        boolean caesarCipher = caesarCipher(25 - rotations);
+                        boolean caesarCipher = caesarCipher(26 - rotations);
                         if (!caesarCipher) {
                             cantBeUndone(operation);
                         } else {
@@ -182,5 +193,11 @@ public class UnMixer extends Mixer {
             }
             System.out.println(getMessage().getList());
         }
+    }
+
+    public static void main(String[] args) {
+        String message = IntStream.range(0, args.length - 1).mapToObj(i -> args[i] + (i >= args.length - 1? "" : " ")).collect(Collectors.joining());
+        message = message.substring(0, message.length() - 1);
+        Menu.mainUnmixMenu(message, args[args.length - 1]);
     }
 }

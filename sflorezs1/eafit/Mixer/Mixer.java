@@ -1,21 +1,25 @@
 package sflorezs1.eafit.Mixer;
 
-import sflorezs1.eafit.IO.Clipboard;
 import sflorezs1.eafit.IO.InputOutput;
 import sflorezs1.eafit.Lists.LinkedList;
 import sflorezs1.eafit.Lists.Stack;
+import sflorezs1.eafit.Menu.Menu;
 import sflorezs1.eafit.Message;
 
+import java.io.IOException;
 import java.util.InputMismatchException;
+import java.util.Objects;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class Mixer {
-    private Message message;
+    private final Message message;
 
     public Mixer(String text) {
         message = new Message(InputOutput.readMessage(text));
     }
 
-    public Mixer(Message message) {
+    protected Mixer(Message message) {
         this.message = message;
     }
 
@@ -28,10 +32,22 @@ public class Mixer {
         Stack<String> operations = this.message.getOperations();
         String[] parts = operation.split(" ");
         switch (parts[0]) {
+            case "Q":
+                try {
+                    String output = IntStream.range(1, parts.length).mapToObj(i -> parts[i] + (i >= parts.length - 1? "" : " ")).collect(Collectors.joining());
+                    InputOutput.writeKey(output, this.message);
+                    System.out.println("Your final mixed up message: " + message.getList().representString());
+                    System.out.println("The key to your message was written to the file [" + output + "]");
+                    return;
+                } catch (IOException e) {
+                    System.err.println("Something went wrong while saving, the file, please try again");
+                    return;
+                }
             case "b":
                 try {
-                    LinkedList<Character> str = InputOutput.readMessage(parts[1]);
-                    int position = Integer.parseInt(parts[2]);
+                    String sb = IntStream.range(1, parts.length - 1).mapToObj(i -> parts[i] + (i >= parts.length - 1? "" : " ")).collect(Collectors.joining());
+                    LinkedList<Character> str = InputOutput.readMessage(sb);
+                    int position = Integer.parseInt(parts[parts.length - 1]);
                     boolean insert = insertAt(position, str);
                     if (!insert) {
                         System.out.println("\nThe operation [" + operation + "] could not be performed, try again.\n");
@@ -66,12 +82,12 @@ public class Mixer {
             case "d":
                 try {
                     char deletable = parts[1].charAt(0);
-                    LinkedList delete = deleteChar(deletable);
+                    LinkedList<Integer> delete = deleteChar(deletable);
                     if (delete.size() == 0) {
                         System.out.println("\nThe operation [" + operation + "]could not be performed there is no ["+ deletable +"], try again.\n");
                     } else {
                         System.out.println("\nOperation [" + operation + "] performed successfully.\n");
-                        operations.push(operation + ";%;" + delete.toString());
+                        operations.push(operation + ";%;" + delete.simpleString());
                     }
                     break;
                 } catch (InputMismatchException e) {
@@ -80,15 +96,16 @@ public class Mixer {
                 }
             case "f":
                 try {
-                    char original = parts[1].charAt(0);
-                    char replacing = parts[2].charAt(0);
+                    String fstring = IntStream.range(1, parts.length).mapToObj(i -> parts[i] + (i >= parts.length - 1? "": " ")).collect(Collectors.joining());
+                    char original = fstring.charAt(0);
+                    char replacing = fstring.charAt(2);
                     LinkedList<Integer> replace = replace(original, replacing);
                     if (replace == null) {
                         System.out.println("\nThe operation [" + operation + "] could not be performed. There is no ["
                                 + original +"] in the message, try again.\n");
                     } else {
                         System.out.println("\nOperation [" + operation + "] performed successfully.\n");
-                        operations.push(operation + ";%;" + replace.toString());
+                        operations.push(operation + ";%;" + replace.simpleString());
                     }
                     break;
                 } catch (InputMismatchException e) {
@@ -192,18 +209,38 @@ public class Mixer {
                 }
             case "z":
                 System.out.println("=-==-===-====-=====Randomizing======-====-===-==-=");
-                randomize((int) (Math.random() * 7));
+                randomize((int) (Math.random() * 14) + 4);
                 System.out.println("=-==-===-====-=====Randomized======-====-===-==-=");
                 break;
             default:
                 System.out.println("The specified operation [" + operation +
                         "] was nos recognized as a valid operation, please visit the help page [h]");
         }
+        displayCurrentMessage();
+    }
+
+    private void displayCurrentMessage() {
+        LinkedList<Integer> enumeration = new LinkedList<>();
+        for (int i = 0; i < this.message.getList().size(); i++) enumeration.append(i);
+        System.out.println("\nYour current message is: \n");
         System.out.println(this.getMessage().getList());
+        System.out.println(enumeration);
+        System.out.println();
     }
 
     public void helpPage() {
-        /* TODO() */
+        System.out.println("\n=-==-Help page-==-=\n");
+        System.out.println("These are the commands available for this program:\n");
+        System.out.println("\tQ filename\t -Quit editing, save the key in a file [filename] and show final message.");
+        System.out.println("\tb s #\t\t -Insert a String [s], at the position [#] in the message.");
+        System.out.println("\tr # #\t\t -Remove all characters in the interval [#, 3] fom the message.");
+        System.out.println("\th\t\t\t -Display this help page.");
+        System.out.println("\td #\t\t\t -Delete all the characters [#] from the message.");
+        System.out.println("\tf * *\t\t -Replace all the characters [*] with [*] in the message. {Note: both [*] are single characters.}");
+        System.out.println("\tz\t\t\t -Perform random series of [b], [r], [d] or [f] operations.");
+        System.out.println("\ts #\t\t\t -Shift all the characters a number [#] of times. {Note: 0 > # > length of the message.}");
+        System.out.println("\tm\t\t\t -Mirror the message.");
+        System.out.println("\tcc #\t\t -Change all the characters with its [#]th successor (Caesar cipher). {Note: 0 > # > 26}\n");
     }
 
     /**
@@ -229,6 +266,15 @@ public class Mixer {
      * @return True if the operation was successfully performed else False
      */
     protected boolean insertAt(int position, LinkedList<Character> insert) {
+        if (this.message.getList().size() == 0 && position == 0) {
+            this.message.getList().append(' ');
+            if (position >= this.message.getList().size()) return false;
+            for (int i = insert.size() - 1; i >= 0; i--) {
+                this.message.getList().insert(position, insert.get(i));
+            }
+            this.message.getList().remove(this.message.getList().size() - 1);
+            return true;
+        }
         if (position >= this.message.getList().size() || position < 0) return false;
         for (int i = insert.size() - 1; i >= 0; i--) {
             this.message.getList().insert(position, insert.get(i));
@@ -263,7 +309,7 @@ public class Mixer {
         for(int i = 0; i < this.message.getList().size(); i++) {
             if (this.message.getList().get(i).equals(o)) {
                 this.message.getList().replace(i, r);
-                positions.append(i);
+                Objects.requireNonNull(positions).append(i);
             }
         }
         return positions;
@@ -331,27 +377,27 @@ public class Mixer {
     private boolean randomize(int times) {
         if (times == -1) return true;
         String[] cases = {"b", "r", "d", "f"};
-        String str = cases[(int)(Math.random() * cases.length)];
+        String str = this.message.getList().size() == 0? "b" : cases[(int)(Math.random() * cases.length)];
         switch (str) {
-            case "b" -> {
+            case "b":
                 String stringB = randomString();
                 int positionB = (int) (Math.random() * this.message.getList().size());
                 str += " " + stringB + " " + positionB;
-            }
-            case "r" -> {
+                break;
+            case "r":
                 int startR = (int) (Math.random() * this.message.getList().size());
                 int endR = (int) (Math.random() * this.message.getList().size());
                 str += " " + Math.min(startR, endR) + " " + Math.max(startR, endR);
-            }
-            case "d" -> {
+                break;
+            case "d":
                 char c = this.message.getList().get((int) (Math.random() * this.message.getList().size()));
                 str += " " + (c == ' ' ? 'a' : c);
-            }
-            case "f" -> {
+                break;
+            case "f":
                 char part1 = this.message.getList().get((int) (Math.random() * this.message.getList().size()));
                 char part2 = this.message.getList().get((int) (Math.random() * this.message.getList().size()));
                 str += " " + (part1 == ' ' ? 'a' : part1) + " " + (part2 == ' ' ? 'a' : part2);
-            }
+                break;
         }
         mix(str);
         return randomize(times - 1);
@@ -368,5 +414,10 @@ public class Mixer {
 
     public Message getMessage() {
         return message;
+    }
+
+    public static void main(String[] args) {
+        String message = IntStream.range(0, args.length).mapToObj(i -> args[i] + (i >= args.length - 1? "" : " ")).collect(Collectors.joining());
+        Menu.mainMixMenu(message);
     }
 }

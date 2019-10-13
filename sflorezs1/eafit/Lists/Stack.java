@@ -11,9 +11,11 @@ public class Stack <T> {
         this.head = null;
     }
 
-    public Stack(Stack<T> another) {
-        this.head = another.head;
-    }
+// --Commented out by Inspection START (10/13/2019 5:03 PM):
+//    public Stack(Stack<T> another) {
+//        this.head = another.head;
+//    }
+// --Commented out by Inspection STOP (10/13/2019 5:03 PM)
 
     /**
      * Method to get the top element of the Stack and remove it

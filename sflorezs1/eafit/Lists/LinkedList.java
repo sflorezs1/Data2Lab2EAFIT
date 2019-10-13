@@ -11,9 +11,11 @@ public class LinkedList <T> {
         this.head = null;
     }
 
-    public LinkedList(LinkedList<T> another) {
-        this.head = another.head;
-    }
+// --Commented out by Inspection START (10/13/2019 5:03 PM):
+//    public LinkedList(LinkedList<T> another) {
+//        this.head = another.head;
+//    }
+// --Commented out by Inspection STOP (10/13/2019 5:03 PM)
 
     /**
      * Method to get the size of the double linked list
@@ -65,16 +67,28 @@ public class LinkedList <T> {
     public void remove(int index) throws IndexOutOfBoundsException {
         if (this.outOfBounds(index)) throw new IndexOutOfBoundsException();
         else {
-            int i = 0;
-            Node<T> item = this.head;
-            while (i < index) {
-                item = item.getNext();
-                i++;
-            }
-            if (item.getPrevious() != null) {
-                item.getPrevious().setNext(item.getNext());
+            if (index == 0) {
+                if (this.head.getNext() == null) {
+                    this.head = null;
+                } else {
+                    this.head.getNext().setPrevious(null);
+                    this.head = this.head.getNext();
+                }
+            } else if (index == size() - 1) {
+                Node<T> temp = this.head;
+                while (temp.getNext() != null) {
+                    temp = temp.getNext();
+                }
+                temp.getPrevious().setNext(null);
             } else {
-                this.head = this.head.getNext();
+                int i = 0;
+                Node<T> item = this.head;
+                while (i < index - 1) {
+                    item = item.getNext();
+                    i++;
+                }
+                item.getNext().getNext().setPrevious(item);
+                item.setNext(item.getNext().getNext());
             }
         }
     }
@@ -112,11 +126,11 @@ public class LinkedList <T> {
      */
     public void append(T element) {
         if (this.head != null) {
-            Node item = this.head;
+            Node<T> item = this.head;
             while (item.getNext() != null) item = item.getNext();
-            item.setNext(new Node<T>(element, null, item));
+            item.setNext(new Node<>(element, null, item));
         } else {
-            this.head = new Node<T>(element, null, null);
+            this.head = new Node<>(element, null, null);
         }
     }
 
@@ -126,11 +140,11 @@ public class LinkedList <T> {
      */
     public void prepend(T element) {
         if (this.head != null) {
-            Node<T> node = new Node(element, this.head, null);
+            Node<T> node = new Node<>(element, this.head, null);
             this.head.setPrevious(node);
             this.head = node;
         } else {
-            this.head = new Node<T>(element, null, null);
+            this.head = new Node<>(element, null, null);
         }
     }
 
@@ -156,6 +170,16 @@ public class LinkedList <T> {
         Node<T> temp = this.head;
         while (temp != null) {
             s.append(temp.representString());
+            temp = temp.getNext();
+        }
+        return s.toString();
+    }
+
+    public String simpleString() {
+        StringBuilder s = new StringBuilder();
+        Node<T> temp = this.head;
+        while (temp != null) {
+            s.append(temp.simpleString());
             temp = temp.getNext();
         }
         return s.toString();

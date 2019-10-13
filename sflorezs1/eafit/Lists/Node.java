@@ -5,42 +5,46 @@ public class Node <T> {
     private Node<T> next;
     private Node<T> previous;
 
-    public Node(T item, Node next, Node previous) {
+    Node(T item, Node<T> next, Node<T> previous) {
         this.item = item;
         this.next = next;
         this.previous = previous;
     }
 
-    public T getItem() {
+    T getItem() {
         return item;
     }
 
-    public Node getNext() {
+    Node<T> getNext() {
         return next;
     }
 
-    public Node getPrevious() {
+    Node<T> getPrevious() {
         return previous;
     }
 
-    public void setItem(T item) {
+    void setItem(T item) {
         this.item = item;
     }
 
-    public void setNext(Node next) {
+    void setNext(Node<T> next) {
         this.next = next;
     }
 
-    public void setPrevious(Node previous) {
+    void setPrevious(Node<T> previous) {
         this.previous = previous;
     }
 
-    public String representString() {
+    String representString() {
         return item.toString();
+    }
+
+    String simpleString() {
+        return item + (next == null? "": "  ");
     }
 
     @Override
     public String toString() {
-        return item + (next == null? "": "  ");
+        return item + (next == null? "": "\t");
     }
 }
