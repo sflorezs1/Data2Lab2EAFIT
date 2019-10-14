@@ -116,7 +116,7 @@ public class UnMixer extends Mixer {
                         int pclipboard = Integer.parseInt(clipboard.get(0) + "");
                         clipboard.remove(0);
                         getMessage().getClipboard().copy(pclipboard, clipboard);
-                        LinkedList<Character> unPaste = deleteRange(Integer.parseInt(parts[1]), clipboard.size());
+                        LinkedList<Character> unPaste = deleteRange(Integer.parseInt(parts[1]), clipboard.size() + Integer.parseInt(parts[1]));
                         if (unPaste == null) {
                             cantBeUndone(operation);
                         } else {

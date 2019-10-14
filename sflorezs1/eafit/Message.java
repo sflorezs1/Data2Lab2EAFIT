@@ -27,6 +27,7 @@ public class Message {
     public Message(LinkedList<Character> list, Stack<String> operations) {
         this.list = list;
         this.operations = operations;
+        this.clipboard = new Clipboard();
     }
 
     public LinkedList<Character> getList() {

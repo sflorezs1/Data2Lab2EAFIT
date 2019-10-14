@@ -170,8 +170,11 @@ public class Mixer {
                         operations.push(operation + ";%;" + this.message.getClipboard().saveClipboard(pclipboard));
                     }
                     break;
-                } catch (Exception e) {
+                } catch (NumberFormatException e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [p # &], please visit the help page [h]");
+                    break;
+                } catch (NullPointerException e) {
+                    System.err.println("The given clipboard ["+ Integer.parseInt(parts[2]) +"] does not exist");
                     break;
                 }
             case "c":
@@ -187,8 +190,11 @@ public class Mixer {
                         System.out.println(this.message.getClipboard().showClipboard(cclipboard));
                     }
                     break;
-                } catch (Exception e) {
+                } catch (NumberFormatException e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [c # % &], please visit the help page [h]");
+                    break;
+                } catch (NullPointerException e) {
+                    System.err.println(e);
                     break;
                 }
             case "x":
