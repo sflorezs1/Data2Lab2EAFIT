@@ -7,6 +7,7 @@ import sflorezs1.eafit.Menu.Menu;
 import sflorezs1.eafit.Message;
 
 import java.io.IOException;
+import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.Objects;
 import java.util.stream.Collectors;
@@ -39,13 +40,13 @@ public class Mixer {
                     System.out.println("Your final mixed up message: " + message.getList().representString());
                     System.out.println("The key to your message was written to the file [" + output + "]");
                     return;
-                } catch (IOException e) {
+                } catch (Exception e) {
                     System.err.println("Something went wrong while saving, the file, please try again");
                     return;
                 }
             case "b":
                 try {
-                    String sb = IntStream.range(1, parts.length - 1).mapToObj(i -> parts[i] + (i >= parts.length - 1? "" : " ")).collect(Collectors.joining());
+                    String sb = IntStream.range(1, parts.length - 1).mapToObj(i -> parts[i] + (i >= parts.length - 2? "" : " ")).collect(Collectors.joining());
                     LinkedList<Character> str = InputOutput.readMessage(sb);
                     int position = Integer.parseInt(parts[parts.length - 1]);
                     boolean insert = insertAt(position, str);
@@ -56,7 +57,7 @@ public class Mixer {
                         operations.push(operation);
                     }
                     break;
-                } catch (InputMismatchException e) {
+                } catch (Exception e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [b s #], please visit the help page [h]");
                     break;
                 }
@@ -72,7 +73,7 @@ public class Mixer {
                         operations.push(operation + ";%;" + remove.representString());
                     }
                     break;
-                } catch (InputMismatchException e) {
+                } catch (Exception e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [r # #], please visit the help page [h]");
                     break;
                 }
@@ -81,7 +82,8 @@ public class Mixer {
                 break;
             case "d":
                 try {
-                    char deletable = parts[1].charAt(0);
+                    String sb = operation.substring(1);
+                    char deletable = sb.charAt(1);
                     LinkedList<Integer> delete = deleteChar(deletable);
                     if (delete.size() == 0) {
                         System.out.println("\nThe operation [" + operation + "]could not be performed there is no ["+ deletable +"], try again.\n");
@@ -90,13 +92,13 @@ public class Mixer {
                         operations.push(operation + ";%;" + delete.simpleString());
                     }
                     break;
-                } catch (InputMismatchException e) {
+                } catch (Exception e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [d #], please visit the help page [h]");
                     break;
                 }
             case "f":
                 try {
-                    String fstring = IntStream.range(1, parts.length).mapToObj(i -> parts[i] + (i >= parts.length - 1? "": " ")).collect(Collectors.joining());
+                    String fstring = operation.substring(1);
                     char original = fstring.charAt(0);
                     char replacing = fstring.charAt(2);
                     LinkedList<Integer> replace = replace(original, replacing);
@@ -108,7 +110,7 @@ public class Mixer {
                         operations.push(operation + ";%;" + replace.simpleString());
                     }
                     break;
-                } catch (InputMismatchException e) {
+                } catch (Exception e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [f * *], please visit the help page [h]");
                     break;
                 }
@@ -122,7 +124,7 @@ public class Mixer {
                         operations.push(operation);
                     }
                     break;
-                } catch (InputMismatchException e) {
+                } catch (Exception e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [m], please visit the help page [h]");
                     break;
                 }
@@ -137,7 +139,7 @@ public class Mixer {
                         operations.push(operation);
                     }
                     break;
-                } catch (InputMismatchException e) {
+                } catch (Exception e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [cc #], please visit the help page [h]");
                     break;
                 }
@@ -152,7 +154,7 @@ public class Mixer {
                         operations.push(operation);
                     }
                     break;
-                } catch (InputMismatchException e) {
+                } catch (Exception e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [s #], please visit the help page [h]");
                     break;
                 }
@@ -168,7 +170,7 @@ public class Mixer {
                         operations.push(operation + ";%;" + this.message.getClipboard().saveClipboard(pclipboard));
                     }
                     break;
-                } catch (InputMismatchException e) {
+                } catch (Exception e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [p # &], please visit the help page [h]");
                     break;
                 }
@@ -185,7 +187,7 @@ public class Mixer {
                         System.out.println(this.message.getClipboard().showClipboard(cclipboard));
                     }
                     break;
-                } catch (InputMismatchException e) {
+                } catch (Exception e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [c # % &], please visit the help page [h]");
                     break;
                 }
@@ -203,7 +205,7 @@ public class Mixer {
                         operations.push(operation);
                     }
                     break;
-                } catch (InputMismatchException e) {
+                } catch (Exception e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [x # % &], please visit the help page [h]");
                     break;
                 }
@@ -272,12 +274,18 @@ public class Mixer {
             for (int i = insert.size() - 1; i >= 0; i--) {
                 this.message.getList().insert(position, insert.get(i));
             }
-            this.message.getList().remove(this.message.getList().size() - 1);
+            this.message.getList().remove(0);
             return true;
         }
-        if (position >= this.message.getList().size() || position < 0) return false;
-        for (int i = insert.size() - 1; i >= 0; i--) {
-            this.message.getList().insert(position, insert.get(i));
+        if (position > this.message.getList().size() || position < 0) return false;
+        if (position == this.message.getList().size()) {
+            for (int i = 0; i < insert.size(); i++) {
+                this.message.getList().append(insert.get(i));
+            }
+        } else {
+            for (int i = insert.size() - 1; i >= 0; i--) {
+                this.message.getList().insert(position, insert.get(i));
+            }
         }
         return true;
     }
@@ -391,12 +399,12 @@ public class Mixer {
                 break;
             case "d":
                 char c = this.message.getList().get((int) (Math.random() * this.message.getList().size()));
-                str += " " + (c == ' ' ? 'a' : c);
+                str += " " + c;
                 break;
             case "f":
                 char part1 = this.message.getList().get((int) (Math.random() * this.message.getList().size()));
                 char part2 = this.message.getList().get((int) (Math.random() * this.message.getList().size()));
-                str += " " + (part1 == ' ' ? 'a' : part1) + " " + (part2 == ' ' ? 'a' : part2);
+                str += " " + part1 + " " + part2;
                 break;
         }
         mix(str);
