@@ -1,4 +1,4 @@
-package sflorezs1.eafit.Lists;
+package sflorezs1.eafit.lists;
 
 /**
  * Simple stack implementation for academic purposes
@@ -7,15 +7,12 @@ package sflorezs1.eafit.Lists;
 public class Stack <T> {
     private Node<T> head;
 
+    /**
+     * Constructor for the Stack class
+     */
     public Stack() {
         this.head = null;
     }
-
-// --Commented out by Inspection START (10/13/2019 5:03 PM):
-//    public Stack(Stack<T> another) {
-//        this.head = another.head;
-//    }
-// --Commented out by Inspection STOP (10/13/2019 5:03 PM)
 
     /**
      * Method to get the top element of the Stack and remove it

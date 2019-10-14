@@ -1,21 +1,18 @@
-package sflorezs1.eafit.Lists;
+package sflorezs1.eafit.lists;
 
 /**
- * Simple implementation of a double linked list without a tail for academic purposes
+ * Simple implementation of a double linked list without a tail and extra methods for academic purposes
  * @param <T> Data type to store
  */
 public class LinkedList <T> {
     private Node<T> head;
 
+    /**
+     * Constructor for the LinkedList class
+     */
     public LinkedList() {
         this.head = null;
     }
-
-// --Commented out by Inspection START (10/13/2019 5:03 PM):
-//    public LinkedList(LinkedList<T> another) {
-//        this.head = another.head;
-//    }
-// --Commented out by Inspection STOP (10/13/2019 5:03 PM)
 
     /**
      * Method to get the size of the double linked list
@@ -150,9 +147,9 @@ public class LinkedList <T> {
 
     /**
      * Method to replace a element in the list with another one given its index
-     * @param index
-     * @param element
-     * @throws IndexOutOfBoundsException
+     * @param index Index of the element to be replaced
+     * @param element Replacement element
+     * @throws IndexOutOfBoundsException if index lesser than 0 or index greater or equal to size()
      */
     public void replace(int index, T element) throws IndexOutOfBoundsException {
         if (outOfBounds(index)) throw new IndexOutOfBoundsException();
@@ -165,6 +162,10 @@ public class LinkedList <T> {
         temp.setItem(element);
     }
 
+    /**
+     * String representation of the LinkedList, not the same as toString() or simpleString()
+     * @return A String representation of the LinkedList
+     */
     public String representString() {
         StringBuilder s = new StringBuilder();
         Node<T> temp = this.head;
@@ -175,6 +176,10 @@ public class LinkedList <T> {
         return s.toString();
     }
 
+    /**
+     * Simple String representation of the LinkedList, not the same as toString() or representString()
+     * @return A simple String representation of the LinkedList
+     */
     public String simpleString() {
         StringBuilder s = new StringBuilder();
         Node<T> temp = this.head;
@@ -185,7 +190,12 @@ public class LinkedList <T> {
         return s.toString();
     }
 
-    public boolean contains(Object someObject) {
+    /**
+     * Check whether or not the list contains some element
+     * @param someObject Element to be checked for
+     * @return whether or not the list contains the element
+     */
+    public boolean contains(T someObject) {
         for (int i = 0; i < this.size(); i++) {
             if (get(i).equals(someObject)) {
                 return true;

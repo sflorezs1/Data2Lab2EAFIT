@@ -1,42 +1,61 @@
-package sflorezs1.eafit.UnMixer;
+package sflorezs1.eafit.unmixer;
 
-import sflorezs1.eafit.IO.InputOutput;
-import sflorezs1.eafit.Lists.LinkedList;
-import sflorezs1.eafit.Lists.Stack;
-import sflorezs1.eafit.Menu.Menu;
+import sflorezs1.eafit.io.InputOutput;
+import sflorezs1.eafit.lists.LinkedList;
+import sflorezs1.eafit.lists.Stack;
+import sflorezs1.eafit.menu.Menu;
 import sflorezs1.eafit.Message;
-import sflorezs1.eafit.Mixer.Mixer;
+import sflorezs1.eafit.mixer.Mixer;
 
 import java.util.InputMismatchException;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
+
+/**
+ * UnMixer program, to unmix a given message mixed up by the Mixer program
+ */
 public class UnMixer extends Mixer {
 
+    /**
+     * Constructor for the UnMixer class
+     * @param message Message to be unmixed
+     */
     public UnMixer(Message message) {
         super(message);
     }
 
+    /**
+     * Display a message when an operation could not be undone
+     * @param operation Operation that could not be undone
+     */
     private void cantBeUndone(String operation) {
         System.out.println("Operation [" + operation + "] could not be undone, please check the structure of the key");
     }
 
+    /**
+     * Display a message when an operation could be undone
+     * @param operation Operation that could be undone
+     */
     private void undone(String operation) {
-        System.out.println("Operation [" + operation + "] undone successfully");
+        System.out.println("Operation [" + (operation.contains(";%;")? operation.split(";%;")[0] : operation) + "] undone successfully");
     }
 
+    /**
+     * Unmix a given message
+     */
     public void unMix() {
         Stack<String> operations = super.getMessage().getOperations();
         while (operations.peek() != null) {
             String operation = operations.pop();
-            System.out.println("Undoing [" + operation + "]");
+            System.out.println("Undoing [" + (operation.contains(";%;")? operation.split(";%;")[0] : operation) + "]");
             String[] parts = operation.split(" ");
             switch (parts[0]) {
                 case "b":
                     try {
                         String sb = IntStream.range(1, parts.length - 1).mapToObj(i -> parts[i] + (i >= parts.length - 1 ? "" : " ")).collect(Collectors.joining());
                         int startB = Integer.parseInt(parts[parts.length - 1]);
-                        int endB = sb.length() + startB - 1;
+                        int endB = sb.length() + startB - 2;
                         LinkedList<Character> unInsertAt = deleteRange(startB, endB);
                         if (unInsertAt == null) {
                             cantBeUndone(operation);
@@ -76,7 +95,7 @@ public class UnMixer extends Mixer {
                     try {
                         if (operation.split(";%;").length > 1) {
                             String[] partsd = operation.split(";%;");
-                            LinkedList<Character> deleted = InputOutput.readMessage(partsd[0].split(" ")[1]);
+                            LinkedList<Character> deleted = InputOutput.readMessage(operation.charAt(operation.indexOf(";%;") - 1) + "");
                             LinkedList<Integer> positions = InputOutput.parseIntList(partsd[1]);
                             for (int i = 0; i < positions.size(); i++) {
                                 if (positions.get(i) >= getMessage().getList().size()) {
@@ -85,7 +104,6 @@ public class UnMixer extends Mixer {
                                     insertAt(positions.get(i), deleted);
                                 }
                             }
-                            undone(operation);
                         }
                         undone(operation);
                         break;
@@ -97,7 +115,12 @@ public class UnMixer extends Mixer {
                 case "f":
                     try {
                         if (operation.split(";%;").length > 1) {
-                            char original = parts[1].charAt(0);
+                            if (operation.substring(2).split(";%;")[0].length() > 3) {
+                                System.err.println("The given key [" + operation + "] does not match the structure [f * *;%;#l]," +
+                                        " the key may be corrupted");
+                                break;
+                            }
+                            char original = operation.substring(2).charAt(0);
                             LinkedList<Integer> positions = InputOutput.parseIntList(operation.split(";%;")[1]);
                             for (int i = 0; i < positions.size(); i++) {
                                 getMessage().getList().replace(positions.get(i), original);
@@ -195,6 +218,10 @@ public class UnMixer extends Mixer {
         }
     }
 
+    /**
+     * Main method for the UnMix program
+     * @param args Arguments given by the user at call
+     */
     public static void main(String[] args) {
         String message = IntStream.range(0, args.length - 1).mapToObj(i -> args[i] + (i >= args.length - 1? "" : " ")).collect(Collectors.joining());
         message = message.substring(0, message.length() - 1);

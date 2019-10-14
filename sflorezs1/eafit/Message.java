@@ -1,13 +1,13 @@
 package sflorezs1.eafit;
 
-import sflorezs1.eafit.IO.Clipboard;
-import sflorezs1.eafit.Lists.LinkedList;
-import sflorezs1.eafit.Lists.Stack;
+import sflorezs1.eafit.io.Clipboard;
+import sflorezs1.eafit.lists.LinkedList;
+import sflorezs1.eafit.lists.Stack;
 
 public class Message {
     private LinkedList<Character> list;
     private final Stack<String> operations;
-    private Clipboard clipboard;
+    private final Clipboard clipboard;
 
     /**
      * Constructor to be used in the mixer
@@ -30,31 +30,35 @@ public class Message {
         this.clipboard = new Clipboard();
     }
 
+    /**
+     * Getter for the double linked list of characters
+     * @return LinkedList of characters
+     */
     public LinkedList<Character> getList() {
         return list;
     }
 
+    /**
+     * Setter for the double linked list of characters
+     * @param list New list to be set
+     */
     public void setList(LinkedList<Character> list) {
         this.list = list;
     }
 
+    /**
+     * Getter for the stack of operations performed
+     * @return Stack of String representing the operations
+     */
     public Stack<String> getOperations() {
         return operations;
     }
 
-// --Commented out by Inspection START (10/13/2019 5:03 PM):
-//    public void setOperations(Stack<String> operations) {
-//        this.operations = operations;
-//    }
-// --Commented out by Inspection STOP (10/13/2019 5:03 PM)
-
+    /**
+     * Getter for the clipboard
+     * @return Clipboard
+     */
     public Clipboard getClipboard() {
         return clipboard;
     }
-
-// --Commented out by Inspection START (10/13/2019 5:03 PM):
-//    public void setClipboard(Clipboard clipboard) {
-//        this.clipboard = clipboard;
-//    }
-// --Commented out by Inspection STOP (10/13/2019 5:03 PM)
 }

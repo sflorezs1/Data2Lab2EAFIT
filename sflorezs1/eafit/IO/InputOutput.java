@@ -1,13 +1,14 @@
-package sflorezs1.eafit.IO;
+package sflorezs1.eafit.io;
 
-import sflorezs1.eafit.Lists.*;
+import sflorezs1.eafit.lists.LinkedList;
+import sflorezs1.eafit.lists.Stack;
 import sflorezs1.eafit.Message;
 
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.Scanner;
 import java.io.PrintWriter;
+import java.util.Scanner;
 
 public class InputOutput {
 
@@ -41,7 +42,8 @@ public class InputOutput {
     /**
      * Method to read a file with a encrypted message with a key
      * @param pathToFile Path to the file to be analyzed
-     * @return A Message to be decrypted
+     * @param message A Message to be decrypted
+     * @return Message object with a list and a stack of operations
      * @throws IOException In case there is an error related to the file
      */
     public static Message readFile(LinkedList<Character> message, String pathToFile) throws IOException {
@@ -55,6 +57,12 @@ public class InputOutput {
         return new Message(message, operations);
     }
 
+    /**
+     * Create a key for a mixed message
+     * @param pathToSave Path for the key file to be saved
+     * @param message Mixed up message
+     * @throws IOException If something goes wrong while creating the file
+     */
     public static void writeKey(String pathToSave, Message message) throws IOException {
         File file = new File(pathToSave);
         if (!file.exists()) {
@@ -91,6 +99,11 @@ public class InputOutput {
         }
     }
 
+    /**
+     * Method to confirm whether or not a user wants to overwrite an existing file
+     * @param message Mixed up message
+     * @return True if the user wants to overwrite a file, otherwise false
+     */
     private static boolean overwrite(Message message) {
         System.out.print("\nThe specified file already exists, do you want to overwrite it? ");
         String option = readLine("Y/N");
@@ -112,20 +125,22 @@ public class InputOutput {
         }
     }
 
-// --Commented out by Inspection START (10/13/2019 5:03 PM):
-//    public static int readInt(String ask) {
-//        System.out.print(ask + ": ");
-//        Scanner sc = new Scanner(System.in);
-//        return sc.nextInt();
-//    }
-// --Commented out by Inspection STOP (10/13/2019 5:03 PM)
-
+    /**
+     * Ask a question and get an input
+     * @param ask Question to ask
+     * @return The user input for the question
+     */
     public static String readLine(String ask) {
         System.out.print(ask + ": ");
         Scanner sc = new Scanner(System.in);
         return sc.nextLine();
     }
 
+    /**
+     * Parse a String representation of a LinkedList of Integer
+     * @param intList String representation
+     * @return LinkedList of Integer
+     */
     public static LinkedList<Integer> parseIntList(String intList) {
         LinkedList<Integer> list = new LinkedList<>();
         String[] parts = intList.split(" ");
@@ -135,6 +150,11 @@ public class InputOutput {
         return list;
     }
 
+    /**
+     * Parse a String representation of a LinkedList of Character
+     * @param intList String representation
+     * @return LinkedList of Character
+     */
     public static LinkedList<Character> parseCharList(String intList) {
         LinkedList<Character> list = new LinkedList<>();
         String[] parts = intList.split(" ");

@@ -1,6 +1,6 @@
-package sflorezs1.eafit.Lists;
+package sflorezs1.eafit.lists;
 
-public class Node <T> {
+class Node <T> {
     private T item;
     private Node<T> next;
     private Node<T> previous;

@@ -1,25 +1,33 @@
-package sflorezs1.eafit.Mixer;
+package sflorezs1.eafit.mixer;
 
-import sflorezs1.eafit.IO.InputOutput;
-import sflorezs1.eafit.Lists.LinkedList;
-import sflorezs1.eafit.Lists.Stack;
-import sflorezs1.eafit.Menu.Menu;
+import sflorezs1.eafit.io.InputOutput;
+import sflorezs1.eafit.lists.LinkedList;
+import sflorezs1.eafit.lists.Stack;
+import sflorezs1.eafit.menu.Menu;
 import sflorezs1.eafit.Message;
 
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.InputMismatchException;
 import java.util.Objects;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class Mixer {
+    /**
+     * Message to be mixed up
+     */
     private final Message message;
 
+    /**
+     * Constructor for the case only the message text is available
+     * @param text Initial text message
+     */
     public Mixer(String text) {
         message = new Message(InputOutput.readMessage(text));
     }
 
+    /**
+     * Constructor for the case the entire message is available
+     * @param message Message to be mixed up
+     */
     protected Mixer(Message message) {
         this.message = message;
     }
@@ -98,7 +106,11 @@ public class Mixer {
                 }
             case "f":
                 try {
-                    String fstring = operation.substring(1);
+                    String fstring = operation.substring(2);
+                    if (fstring.length() > 3) {
+                        System.err.println("The given operation [" + operation + "] does not match the structure [f * *], please visit the help page [h]");
+                        break;
+                    }
                     char original = fstring.charAt(0);
                     char replacing = fstring.charAt(2);
                     LinkedList<Integer> replace = replace(original, replacing);
@@ -193,9 +205,6 @@ public class Mixer {
                 } catch (NumberFormatException e) {
                     System.err.println("The given operation [" + operation + "] does not match the structure [c # % &], please visit the help page [h]");
                     break;
-                } catch (NullPointerException e) {
-                    System.err.println(e);
-                    break;
                 }
             case "x":
                 try {
@@ -227,7 +236,10 @@ public class Mixer {
         displayCurrentMessage();
     }
 
-    private void displayCurrentMessage() {
+    /**
+     * Display current message with enumeration
+     */
+    public void displayCurrentMessage() {
         LinkedList<Integer> enumeration = new LinkedList<>();
         for (int i = 0; i < this.message.getList().size(); i++) enumeration.append(i);
         System.out.println("\nYour current message is: \n");
@@ -236,6 +248,9 @@ public class Mixer {
         System.out.println();
     }
 
+    /**
+     * Display help page of the Mixer program
+     */
     public void helpPage() {
         System.out.println("\n=-==-Help page-==-=\n");
         System.out.println("These are the commands available for this program:\n");
@@ -248,7 +263,10 @@ public class Mixer {
         System.out.println("\tz\t\t\t -Perform random series of [b], [r], [d] or [f] operations.");
         System.out.println("\ts #\t\t\t -Shift all the characters a number [#] of times. {Note: 0 > # > length of the message.}");
         System.out.println("\tm\t\t\t -Mirror the message.");
-        System.out.println("\tcc #\t\t -Change all the characters with its [#]th successor (Caesar cipher). {Note: 0 > # > 26}\n");
+        System.out.println("\tcc #\t\t -Change all the letters with its [#]th successor alphabetically (Caesar cipher). {Note: 0 > # > 26}");
+        System.out.println("\tp # &\t\t -Paste from clipboard [&], start at [#]. {Note: [&] is a number}  \n" +
+                "\tc # % &\t\t -Copy to clipboard [&], starting at [#] to [%] (inclusive). {Note: [&] is a number}\n" +
+                "\tx # % &\t\t -Cut to clipboard [&], starting at [#] to [%] (inclusive). {Note: [&] is a number}\n");
     }
 
     /**
@@ -300,7 +318,7 @@ public class Mixer {
      * Deletes all the characters from a message within a given a range
      * @param start Index of the first character
      * @param end Index of the last character
-     * @return True if the operation was successfully performed else False
+     * @return List of deleted characters
      */
     protected LinkedList<Character> deleteRange(int start, int end) {
         if (start >= this.message.getList().size() || start < 0 || start > end || end >= this.message.getList().size()) return null;
@@ -316,7 +334,7 @@ public class Mixer {
      * Replace all instances of a character with another one in the message
      * @param o Character to be replaced
      * @param r New character
-     * @return True if the operation was successfully performed else False
+     * @return Positions where the characters where replaced
      */
     private LinkedList<Integer> replace(Character o, Character r) {
         LinkedList<Integer> positions = this.message.getList().contains(o)? new LinkedList<>() : null;
@@ -329,6 +347,10 @@ public class Mixer {
         return positions;
     }
 
+    /**
+     * Reverse the message
+     * @return True if the operation was successfully performed else False
+     */
     protected boolean mirror() {
         LinkedList<Character> mirrored = new LinkedList<>();
         for (int i = 0; i < this.message.getList().size(); i++) mirrored.prepend(this.message.getList().get(i));
@@ -336,6 +358,13 @@ public class Mixer {
         return true;
     }
 
+    /**
+     * Copy to clipboard
+     * @param nClipboard Number of the clipboard to be copied at
+     * @param start Start [Inclusive] of the interval to be copied
+     * @param end End [Inclusive] of the interval to be copied
+     * @return True if the operation was successfully performed else False
+     */
     private boolean copy(int nClipboard, int start, int end) {
         if (start >= this.message.getList().size() || start < 0 || start > end || end >= this.message.getList().size()) return false;
         LinkedList<Character> part = new LinkedList<>();
@@ -346,15 +375,33 @@ public class Mixer {
         return true;
     }
 
+    /**
+     * Cut to clipboard
+     * @param nClipboard Number of the clipboard to be cut at
+     * @param start Start [Inclusive] of the interval to be cut
+     * @param end End [Inclusive] of the interval to be cut
+     * @return True if the operation was successfully performed else False
+     */
     private boolean cut(int nClipboard, int start, int end) {
         return copy(nClipboard, start, end) && (deleteRange(start, end) != null);
     }
 
+    /**
+     * Paste from clipboard
+     * @param nClipboard Number of the clipboard to be pasted from
+     * @param position Position to paste at
+     * @return True if the operation was successfully performed else False
+     */
     protected boolean paste(int nClipboard, int position) {
         if (position >= this.message.getList().size() || position < 0) return false;
         return insertAt(position, this.message.getClipboard().paste(nClipboard));
     }
 
+    /**
+     * Change all the letters within the message with its successor alphabetically
+     * @param times Number of times the operation will be performed
+     * @return True if the operation was successfully performed else False
+     */
     protected boolean caesarCipher(int times) {
         if (times < 0 || times > 25) return false;
         for (int i = 0; i < this.message.getList().size(); i++) {
@@ -379,6 +426,11 @@ public class Mixer {
         return true;
     }
 
+    /**
+     * Shift all characters n times to the right
+     * @param rotations Number of times the characters will be shifted
+     * @return True if the operation was successfully performed else False
+     */
     protected boolean shift(int rotations) {
         if (rotations > this.message.getList().size() || rotations < 0) return false;
         LinkedList<Character> end = new LinkedList<>();
@@ -388,6 +440,11 @@ public class Mixer {
         return true;
     }
 
+    /**
+     * Performs a series of operations InsertAt, DeleteRange, DeleteCharacter and Replace
+     * @param times Number of times this will be executed
+     * @return True if the operation was successfully performed else False
+     */
     private boolean randomize(int times) {
         if (times == -1) return true;
         String[] cases = {"b", "r", "d", "f"};
@@ -417,6 +474,10 @@ public class Mixer {
         return randomize(times - 1);
     }
 
+    /**
+     * Helper method for randomize, creates a random String with minimum 1 character and maximum 10
+     * @return Random String
+     */
     private String randomString() {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < ((int) (Math.random() * 9)) + 1; i++) {
@@ -426,10 +487,18 @@ public class Mixer {
         return sb.toString();
     }
 
+    /**
+     * Getter for the Message
+     * @return Message
+     */
     public Message getMessage() {
         return message;
     }
 
+    /**
+     * Main method for the Mixer program
+     * @param args Arguments given by the user at call
+     */
     public static void main(String[] args) {
         String message = IntStream.range(0, args.length).mapToObj(i -> args[i] + (i >= args.length - 1? "" : " ")).collect(Collectors.joining());
         Menu.mainMixMenu(message);
