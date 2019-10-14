@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","url":"allpackages-index.html"},{"l":"sflorezs1.eafit"},{"l":"sflorezs1.eafit.io"},{"l":"sflorezs1.eafit.lists"},{"l":"sflorezs1.eafit.menu"},{"l":"sflorezs1.eafit.mixer"},{"l":"sflorezs1.eafit.unmixer"}]
